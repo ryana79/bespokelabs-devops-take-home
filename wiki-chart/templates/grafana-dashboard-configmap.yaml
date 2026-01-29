@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "wiki-chart.fullname" . }}-grafana-dashboard
+  labels:
+    {{- include "wiki-chart.labels" . | nindent 4 }}
+data:
+  creation-dashboard.json: |
+    {
+      "uid": "creation-dashboard-678",
+      "title": "creation",
+      "schemaVersion": 38,
+      "version": 1,
+      "refresh": "5s",
+      "time": {
+        "from": "now-15m",
+        "to": "now"
+      },
+      "panels": [
+        {
+          "id": 1,
+          "title": "Creation rate",
+          "type": "timeseries",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "targets": [
+            {
+              "expr": "rate(users_created_total[1m])",
+              "legendFormat": "users"
+            },
+            {
+              "expr": "rate(posts_created_total[1m])",
+              "legendFormat": "posts"
+            }
+          ],
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          }
+        }
+      ],
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "name": "Annotations & Alerts",
+            "type": "dashboard",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)"
+          }
+        ]
+      }
+    }

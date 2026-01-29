@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "wiki-chart.fullname" . }}-fastapi
+  labels:
+    {{- include "wiki-chart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.fastapi.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "wiki-chart.fullname" . }}-fastapi
+  template:
+    metadata:
+      labels:
+        app: {{ include "wiki-chart.fullname" . }}-fastapi
+        {{- include "wiki-chart.labels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: fastapi
+          image: "{{ .Values.fastapi.image_name }}:{{ .Values.fastapi.image_tag }}"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: DATABASE_URL
+              value: "postgresql://{{ .Values.postgres.user }}:{{ .Values.postgres.password }}@{{ include "wiki-chart.fullname" . }}-postgres:5432/{{ .Values.postgres.db }}"
+          ports:
+            - containerPort: {{ .Values.fastapi.servicePort }}
+          resources:
+            {{- toYaml .Values.fastapi.resources | nindent 12 }}

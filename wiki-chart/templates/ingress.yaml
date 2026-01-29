@@ -1,0 +1,39 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "wiki-chart.fullname" . }}-ingress
+  labels:
+    {{- include "wiki-chart.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.ingress.className }}
+  ingressClassName: {{ .Values.ingress.className | quote }}
+  {{- end }}
+  rules:
+    - {{- if .Values.ingress.host }}
+      host: {{ .Values.ingress.host | quote }}
+      {{- end }}
+      http:
+        paths:
+          - path: /users
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "wiki-chart.fullname" . }}-fastapi
+                port:
+                  number: {{ .Values.fastapi.servicePort }}
+          - path: /posts
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "wiki-chart.fullname" . }}-fastapi
+                port:
+                  number: {{ .Values.fastapi.servicePort }}
+          - path: /grafana
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "wiki-chart.fullname" . }}-grafana
+                port:
+                  number: 3000
+{{- end }}
